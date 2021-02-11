@@ -1,0 +1,72 @@
+      PROGRAM MAIN 
+      PARAMETER (NDIM=12,NDIML=14)
+      DOUBLE PRECISION T,Y,BRANCH,PAR1,PAR2,AK,A4
+      DIMENSION T(7),Y(NDIML,7),BRANCH(10,NDIML,7)
+      INTEGER UNITLST
+      EXTERNAL FCN,BC,RKF7
+      COMMON /CONST/ AK,A4
+
+C     EXAMPLE DUE TO OLMSTEAD, SIAM J.MATH.ANAL.8 (1977) 392-401
+C     CALCULATION OF PRIMARY BIFURCATION POINTS
+C
+C     TEST OF PACKB3 , USED ALONG WITH STANDARD SOFWARE FOR INTEGRATION 
+C                      AND SOLVING LINEAR EQUATIONS (AS IS INCLUDED IN
+C                      THE FILES ODE1 AND NOLE)
+
+      UNITLST=11
+      OPEN (UNITLST, FILE='DATLST')
+      N=2
+      M=3
+      INDK=1
+      INDL=2
+      T(1)=0.d0
+      T(2)=1.d0
+      T(M)=2.d0
+      A4=0.2d0*TANH(15.d0)
+      AK=1.d0
+      PAR1=1.d0
+      PAR2=50.d0
+      IPR=1
+      IHMAX=50
+      CALL PBP (N,M,T,PAR1,PAR2,INDL,INDK,IPR,BRANCH,IHMAX,
+     1          FCN,BC,RKF7,UNITLST)
+      WRITE (*,*) 'Printout on file DATLST.'
+      STOP
+      END
+
+
+      SUBROUTINE FCN (T,Y,F)
+      PARAMETER (NDIM=12,NDIML=14)
+      DOUBLE PRECISION T,Y(NDIML),F(NDIML),AK,A4,Y1,Y3,Z,A1,AF,AS,AE
+      COMMON /CONST/ AK,A4
+      Y1=Y(1)
+      Y3=Y(3)
+      Z=COS(Y1)
+      A1=5.d0*(3.d0+Z*(2.d0*Z-5.d0))
+      AF=0.2d0*TANH(A1)
+      AS=SIN(Y1)
+      AE=Y3*EXP(AF)
+
+      F(1)=Y(2)
+      F(2)=-AS*AE
+      F(3)=0.d0
+      RETURN
+      END
+      
+                                      
+      SUBROUTINE BC (YA,YB,R)
+      DOUBLE PRECISION YA,YB,R
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION YA(NDIML),YB(NDIML),R(NDIML)
+      R(1)=YA(2)
+      R(2)=YB(2)
+      RETURN
+      END
+
+      SUBROUTINE FCNLIN (T,Y,A)
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION Y(NDIML),A(NDIML,NDIML)
+      DOUBLE PRECISION T,Y,A
+C     THIS IS A DUMMY ROUTINE
+      RETURN
+      END

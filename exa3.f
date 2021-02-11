@@ -1,0 +1,62 @@
+      PROGRAM MAIN
+
+C--  EXAMPLE LORENZ EQUATION
+C    CALCULATION OF HOPF BIFURCATION POINT.
+
+      DOUBLE PRECISION X,Y,EVERE,EVEIM,PAR,EVAIM,PERIOD,EPS
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION X(NDIML),Y(NDIML,7),EVERE(3),EVEIM(3) 
+      INTEGER HFLAG,UNITLST
+      UNITLST=11
+      OPEN (UNITLST, FILE = 'DATLIST')
+
+      PERIOD=0.44
+      PAR=33.
+      X(3)=PAR-1.
+      X(1)=2.*SQRT(X(3))
+      X(2)=X(1)
+      N=3
+      EVAIM=14.3
+      DO 1 I=1,N
+      EVEIM(I)=1.
+1     EVERE(I)=1.
+      EPS=1.d-5
+C     HERE A BETTER GUESS FOR THE EIGENVECTORS MAY BE USED
+      HFLAG=1
+      CALL HOPFA (N,X,PAR,EVAIM,EVERE,EVEIM,PERIOD,HFLAG,EPS,UNITLST)
+      IF (HFLAG.GT.0) WRITE (*,*) ' print-out in file DATLIST.'
+      STOP
+      END
+
+
+      SUBROUTINE FCN (T,Y,F)
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION Y(NDIML),F(NDIML)
+      DOUBLE PRECISION T,Y,F,PAR
+
+C  LORENZ EQUATION
+
+      PAR=Y(4)
+      F(1)=16.d0*(Y(2)-Y(1))
+      F(2)=-Y(1)*Y(3)+PAR*Y(1)-Y(2)
+      F(3)=Y(1)*Y(2)-4.d0*Y(3)
+      RETURN
+      END
+
+
+      SUBROUTINE FCNLIN (T,Y,A)
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION Y(NDIML),A(NDIML,NDIML)
+      DOUBLE PRECISION T,Y,A,PAR
+      PAR=Y(4)
+      A(1,1)=-16.d0
+      A(1,2)=16.d0
+      A(1,3)=0.d0
+      A(2,1)=-Y(3)+PAR
+      A(2,2)=-1.d0
+      A(2,3)=-Y(1)
+      A(3,1)=Y(2)
+      A(3,2)=Y(1)
+      A(3,3)=-4.d0
+      RETURN
+      END

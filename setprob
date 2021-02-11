@@ -1,0 +1,125 @@
+c
+c     This file is part of BIFPACK: a file to set up a new application.
+c
+c
+c
+c
+      SUBROUTINE SETUP (MODEL,N,M,T,NAME1,JACOBI,EPS,
+     1                  IFLAGSOL,WINDOW,YSTART)
+      DOUBLE PRECISION EPS,YSTART,ETACO,ZETACO,PARCO,T,WINDOW
+      PARAMETER (NDIML=14)
+      DIMENSION YSTART(NDIML),T(7),WINDOW(2)
+      CHARACTER*35 NAME1
+      CHARACTER*1 MODEL 
+      COMMON /CONTRO/ ETACO,ZETACO,PARCO, NCO,N1CO,N2CO,
+     1                KCO,IND2CO,NSECFLAG,NFLAG
+
+C   Enter a short name of your problem:
+      NAME1=' '
+C  enter 'a' for an algebraic eq., 'd' for ODE autonomous (periodic sol.),
+C  enter 'b' for a two-point ODE boundary value problem:
+      MODEL=''
+
+C   If a particular solution is known, enter the solution into the
+C   the vector YSTART, and set IFLAGSOL=1.
+      IFLAGSOL=0
+C  In case of a boundary-value problem (MODEL='b') specify the nodes
+C  T(J) of the independent variable, J=1,...,M. The left end of the
+C  integration interval is T(1), the right end is T(M). 
+c      M=
+c      T(1)=
+c      T(M)=
+
+C  N IS THE NUMBER OF state variables (DIFFERENTIAL EQUATIONS):
+      N=
+C   JACOBI=1  IF THE LINEARIZATION IS PROVIDED IN SUBROUTINE
+C   FCNLIN,   ELSE TAKE  JACOBI=0
+      JACOBI=
+C  In case there is a second parameter to be changed, enter NSECFLAG=1,
+C  and enter its value in PARCO=    :
+      NSECFLAG=0
+C  THE RELATIVE ERROR TOLERANCE FOR ALL CALCULATIONS, for example:
+      EPS=1.d-4
+C  Enter a WINDOW interval for admissable values of the 
+C  bifurcation parameter, with window(1) < window(2) :
+      WINDOW(1)=
+      WINDOW(2)=
+      return
+      end
+
+      SUBROUTINE FCN (T,Y,F)
+      DOUBLE PRECISION T,Y,F,PAR,ETACO,ZETACO,PARCO
+      COMMON /CONTRO/ ETACO,ZETACO,PARCO, NCO,N1CO,N2CO,
+     1                KCO,IND2CO,NSECFLAG,NFLAG
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION Y(NDIML),F(NDIML)
+      F(N1CO)=Y(KCO)-ZETACO*Y(IND2CO)-ETACO
+c  For boundary-value problems, choose      F(N1CO)=0.  
+C     THE PARAMETER IS GIVEN BY  Y(N+1)=Y(N1CO)
+      PAR=Y(N1CO)
+C     THIS SUBROUTINE DEFINES THE COMPONENTS OF THE RIGHT-HAND SIDE
+C     F(1),...,F(n)   depending on the input   Y(1),...,Y(n),PAR  .
+C
+C     example:
+
+      F(1)=
+      RETURN
+      END
+
+
+      SUBROUTINE FCNLIN (T,Y,A) 
+      DOUBLE PRECISION T,Y,A,PAR,ETACO,ZETACO,PARCO
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION Y(NDIML),A(NDIML,NDIML)
+      COMMON /CONTRO/ ETACO,ZETACO,PARCO, NCO,N1CO,N2CO,
+     1                KCO,IND2CO,NSECFLAG,NFLAG
+C  THIS ROUTINE ESTABLISHES PARTIAL DERIVATIVES OF RIGHT-HAND SIDE.
+C     THE PARAMETER IS GIVEN BY  PAR=Y(N+1) (=Y(N1CO)):
+      PAR=Y(N1CO)
+C  OUTPUT IS  a(i,j)= partial derivative of f(i) with respect to y(j),
+C                           i,j=1,...,n  .                       
+
+c      A(1,1)=
+      RETURN
+      END
+
+
+C======================================================================
+C
+C   The following is only required for model = 'b' ,
+C   that is, for boundary-value problems:
+C
+C   Discard it if MODEL .ne. b :
+C
+C======================================================================
+
+      SUBROUTINE BC (YA,YB,R)
+C   SUBROUTINE DEFINING BOUNDARY CONDITIONS
+      DOUBLE PRECISION YA,YB,R,ETACO,ZETACO,PARCO,PAR
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION YA(NDIML), YB(NDIML),R(NDIML)
+      COMMON /CONTRO/ ETACO,ZETACO,PARCO, NCO,N1CO,N2CO,
+     1                KCO,IND2CO,NSECFLAG,NFLAG
+C      PAR=YA(N1CO)
+C  YA=y(a), YB=y(b), and PAR=parameter are input,
+C  R(1),...,R(n) have to define n scalar boundary conditions:
+
+c      R(1)=
+C  R(N+1)=YA(KCO)-ETA  , THE NEEDED VALUES ARE SUPPLIED VIA COMMON.
+      R(N1CO)=YA(KCO)-ETACO
+      RETURN
+      END
+
+
+
+      SUBROUTINE BCLIN (YA,YB,R)  
+      COMMON /CONTRO/ ETACO,ZETACO,PARCO, NCO,N1CO,N2CO,
+     1                KCO,IND2CO,NSECFLAG,NFLAG
+C  CONTAINS LINEARIZATION OF BOUNDARY CONDITIONS
+      DOUBLE PRECISION YA,YB,R,ETACO,ZETACO,PARCO
+      PARAMETER (NDIM=12,NDIML=14)
+      DIMENSION YA(NDIML),YB(NDIML),R(NDIML)
+c      R(1)=
+      RETURN
+      END
+

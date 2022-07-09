@@ -10,7 +10,7 @@ EXBSRC := $(wildcard examples/exb*.f)
 EXBBIN := $(patsubst %.f,%, $(EXBSRC))
 EXDSRC := $(wildcard examples/exd*.f)
 EXDBIN := $(patsubst %.f,%, $(EXDSRC))
-F77    := gfortran
+F77    := gfortran -std=legacy
 LIBBIF := bifpack
 LIBSOL := bifsolv
 LIBDIR := lib
